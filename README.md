@@ -4,4 +4,4 @@ I'm using Visual Studio Code
 - Dựa trên tựa game Flappy Bird gốc với 1 số cải tiến như sau:
     + Thêm các cơ chế buff - debuff cho game
     + Thêm config để chạy trên các máy có tần số quét màn hình cao
-    
+    + Các cơ chế ngày và đêm sau 1 mức điểm nhất định

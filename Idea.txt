@@ -1,0 +1,1 @@
+Các buff có trong Flappy Bird SDL2:

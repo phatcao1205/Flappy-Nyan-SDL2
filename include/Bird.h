@@ -1,15 +1,10 @@
 #ifndef BIRD_H
 #define BIRD_H
 
-#include <SDL2/SDL.h>
-#include "Constants.h"
-
+// Cấu trúc đại diện cho chim
 struct Bird {
-    SDL_Rect rect;
-    float y_velocity;
+    float x, y;    // Tọa độ x, y của chim
+    float velocity; // Vận tốc của chim
 };
-
-Bird createBird();
-void drawBird(SDL_Renderer* renderer, const Bird& bird);
 
 #endif

@@ -1,17 +1,11 @@
 #ifndef PIPE_H
 #define PIPE_H
 
-#include <SDL2/SDL.h>
-#include "Constants.h"
-#include "Bird.h"
-
+// Cấu trúc đại diện cho ống
 struct Pipe {
-    SDL_Rect top;
-    SDL_Rect bottom;
+    float x;         // Tọa độ x của ống
+    int topHeight;   // Chiều cao phần trên của ống
+    bool passed;     // Đã vượt qua ống chưa
 };
-
-Pipe createPipe(int x);
-void drawPipe(SDL_Renderer* renderer, const Pipe& pipe);
-bool checkCollision(const Bird& bird, const Pipe& pipe);
 
 #endif

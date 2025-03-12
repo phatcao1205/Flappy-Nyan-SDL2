@@ -1,14 +1,15 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include <SDL2/SDL.h>
-
-// Kích thước cửa sổ
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
-// Màu sắc
-const SDL_Color COLOR_BLACK = {0, 0, 0, 255};
-const SDL_Color COLOR_WHITE = {255, 255, 255, 255};
+// Chiều rộng cửa sổ
+const int WINDOW_WIDTH = 800;
+// Chiều cao cửa sổ
+const int WINDOW_HEIGHT = 600;
+// Kích thước chim
+const int BIRD_SIZE = 40;
+// Chiều rộng ống
+const int PIPE_WIDTH = 70;
+// Khoảng cách giữa các ống
+const int PIPE_GAP = 200;
 
 #endif

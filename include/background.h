@@ -10,14 +10,19 @@ class Background {
 public:
     Background(SDL_Renderer* renderer);  // Hàm khởi tạo
     ~Background();                       // Hàm hủy
-    void render();                       // Vẽ nền và mặt đất
-    int getBaseHeight() const;           // Lấy chiều cao của base
+    void update();                       // Cập nhật vị trí của background và base
+    void render();                       // Vẽ background và base
+    int getBaseHeight();                 // Lấy chiều cao của base
 
 private:
-    SDL_Renderer* renderer;              // Renderer để vẽ
-    SDL_Texture* backgroundTexture;      // Texture của background-day.png
-    SDL_Texture* baseTexture;            // Texture của base.png
-    int baseHeight;                      // Chiều cao của base
+    SDL_Renderer* renderer;
+    SDL_Texture* backgroundTexture;  // Texture của background
+    SDL_Texture* baseTexture;        // Texture của base (mặt đất)
+    int backgroundWidth;             // Chiều rộng của background
+    int baseWidth;                   // Chiều rộng của base
+    int baseHeight;                  // Chiều cao của base
+    int backgroundX;                 // Vị trí x của background
+    int baseX;                       // Vị trí x của base
 };
 
 #endif

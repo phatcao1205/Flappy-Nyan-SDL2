@@ -11,7 +11,7 @@
 Game::Game() {
     SDL_Init(SDL_INIT_VIDEO);  // Khởi tạo SDL
     // Tạo cửa sổ trò chơi
-    window = SDL_CreateWindow("Flappy Bird", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_FULLSCREEN);
+    window = SDL_CreateWindow("Flappy Bird", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     // Tạo renderer để vẽ
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 

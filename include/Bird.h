@@ -4,6 +4,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include "gamestate.h"  // Bao gồm gamestate.h để sử dụng GameState
 
 // Cấu trúc Bird đại diện cho chim
 struct Bird {
@@ -17,7 +18,7 @@ class BirdManager {
 public:
     BirdManager(SDL_Renderer* renderer);  // Hàm khởi tạo
     ~BirdManager();                       // Hàm hủy
-    void updateBird(Bird& bird);          // Cập nhật trạng thái chim
+    void updateBird(Bird& bird, GameState gameState);  // Cập nhật trạng thái chim
     void render(SDL_Renderer* renderer, const Bird& bird);  // Vẽ chim
 
 private:
@@ -26,6 +27,7 @@ private:
     int currentFrame;              // Frame hiện tại của animation
     int frameDelay;                // Thời gian giữa các frame (ms)
     int frameTimer;                // Bộ đếm thời gian để chuyển frame
+    float hoverTimer;              // Bộ đếm thời gian cho hiệu ứng lơ lửng
 };
 
 #endif

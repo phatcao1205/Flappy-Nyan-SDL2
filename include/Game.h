@@ -7,9 +7,14 @@
 #include <SDL2/SDL_ttf.h>
 #include <vector>
 #include "pipe.h"
-#include "bird.h"
 #include "sound.h"
 #include "background.h"
+#include "menu.h"
+#include "gamestate.h"
+
+// Forward declaration cho Bird và BirdManager
+struct Bird;
+class BirdManager;
 
 // Lớp Game quản lý toàn bộ logic của trò chơi
 class Game {
@@ -21,10 +26,10 @@ public:
 private:
     SDL_Window* window;    // Cửa sổ trò chơi
     SDL_Renderer* renderer;  // Renderer để vẽ lên màn hình
-    Bird bird;             // Đối tượng chim
+    Bird* bird;            // Đối tượng chim (sử dụng con trỏ vì forward declaration)
     std::vector<Pipe> pipes;  // Danh sách các ống
     bool running;          // Trạng thái chạy của cửa sổ
-    bool gameOver;         // Trạng thái trò chơi (kết thúc hay không)
+    GameState gameState;   // Trạng thái của trò chơi
     Sound sound;           // Đối tượng quản lý âm thanh
     int score;             // Điểm số của người chơi
     std::vector<bool> pipePassed;  // Theo dõi xem chim đã vượt qua ống nào chưa
@@ -32,6 +37,8 @@ private:
     Background* background;          // Đối tượng quản lý nền và mặt đất
     PipeManager* pipeManager;        // Đối tượng quản lý ống
     BirdManager* birdManager;        // Đối tượng quản lý chim
+    Menu* menu;                      // Đối tượng quản lý menu
+    float delayTimer;                // Bộ đếm thời gian delay (mới thêm)
 
     void handleEvents();  // Xử lý các sự kiện (nhấn phím, thoát game, v.v.)
     void update();        // Cập nhật trạng thái trò chơi

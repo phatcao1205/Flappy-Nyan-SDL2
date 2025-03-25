@@ -6,7 +6,7 @@ SDL2_LDFLAGS := $(shell pkg-config --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer)
 SRC_DIR := src
 BUILD_DIR := builds
 INCLUDE_DIR := include
-TARGET := FlappyBird.exe
+TARGET := FlappyNyan.exe
 
 SRCS := $(wildcard $(SRC_DIR)/*.cpp)
 OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS)) 

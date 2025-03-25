@@ -11,13 +11,16 @@
 Game::Game() {
     SDL_Init(SDL_INIT_VIDEO);  // Khởi tạo SDL
     // Tạo cửa sổ trò chơi
-    window = SDL_CreateWindow("Flappy Bird", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Flappy Nyan", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     // Tạo renderer để vẽ
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    // Khởi tạo đối tượng chim (cấp phát động)
+    SDL_Surface* icon = IMG_Load("assets/icon.png");
+    SDL_SetWindowIcon(window,icon);
+    sound.playBackgroundSound();
+    // Khởi tạo đối tượng mèo (cấp phát động)
     bird = new Bird();
-    bird->rect = {100, SCREEN_HEIGHT / 2, 34, 24};  // Kích thước chim (dựa trên Flappy Bird gốc: 34x24)
+    bird->rect = {100, SCREEN_HEIGHT / 2, 80, 40};  // Kích thước mèo (có thể điều chỉnh nếu cần)
     bird->velocity = 0;
     bird->angle = 0.0;  // Khởi tạo góc xoay ban đầu
     running = true;
@@ -42,17 +45,35 @@ Game::Game() {
 
     // Khởi tạo menu
     menu = new Menu(renderer);
+
+    // Tải gameover.png
+    SDL_Surface* gameOverSurface = IMG_Load("assets/gameover.png");
+        gameOverTexture = SDL_CreateTextureFromSurface(renderer, gameOverSurface);
+        SDL_FreeSurface(gameOverSurface);
+
+    // Lấy kích thước gốc của gameover.png và căn giữa
+    int width = 0, height = 0;
+    if (gameOverTexture) {
+        SDL_QueryTexture(gameOverTexture, nullptr, nullptr, &width, &height);
+    } else {
+        // Nếu không tải được texture, sử dụng kích thước mặc định
+        width = 192;  // Kích thước mặc định (dựa trên Flappy Bird gốc)
+        height = 42;
+    }
+    gameOverRect.w = width;
+    gameOverRect.h = height;
+    gameOverRect.x = (SCREEN_WIDTH - gameOverRect.w) / 2;
+    gameOverRect.y = (SCREEN_HEIGHT - gameOverRect.h) / 2;
 }
 
 // Hàm hủy, dọn dẹp tài nguyên
 Game::~Game() {
     // Giải phóng các texture chữ số
     for (int i = 0; i < 10; i++) {
-        if (digitTextures[i]) {
             SDL_DestroyTexture(digitTextures[i]);
-        }
     }
-    delete bird;        // Giải phóng đối tượng chim
+    SDL_DestroyTexture(gameOverTexture);
+    delete bird;        // Giải phóng đối tượng mèo
     delete background;  // Giải phóng background
     delete pipeManager; // Giải phóng pipe manager
     delete birdManager; // Giải phóng bird manager
@@ -67,16 +88,8 @@ void Game::loadDigitTextures() {
     for (int i = 0; i < 10; i++) {
         std::string path = "assets/" + std::to_string(i) + ".png";
         SDL_Surface* surface = IMG_Load(path.c_str());
-        if (!surface) {
-            SDL_Log("Không thể tải hình ảnh %s: %s", path.c_str(), IMG_GetError());
-            digitTextures[i] = nullptr;
-            continue;
-        }
         digitTextures[i] = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
-        if (!digitTextures[i]) {
-            SDL_Log("Không thể tạo texture từ %s: %s", path.c_str(), SDL_GetError());
-        }
     }
 }
 
@@ -97,8 +110,8 @@ void Game::initPipes() {
 
 // Khởi động lại trò chơi
 void Game::restart() {
-    // Đặt lại vị trí, vận tốc và góc xoay của chim
-    bird->rect = {100, SCREEN_HEIGHT / 2, 34, 24};
+    // Đặt lại vị trí, vận tốc và góc xoay của mèo
+    bird->rect = {100, SCREEN_HEIGHT / 2, 80, 40};
     bird->velocity = 0;
     bird->angle = 0.0;  // Đặt lại góc xoay
 
@@ -144,14 +157,14 @@ void Game::update() {
     }
 
     if (gameState == MENU) {
-        // Ở trạng thái menu, chỉ cập nhật animation và hiệu ứng lơ lửng của chim
+        // Ở trạng thái menu, chỉ cập nhật animation và hiệu ứng lơ lửng của mèo
         birdManager->updateBird(*bird, gameState);
         return;
     }
 
     if (gameState == STARTING) {
-        // Ở trạng thái STARTING, tiếp tục hiệu ứng lơ lửng cho chim
-        birdManager->updateBird(*bird, MENU);  // Sử dụng logic của MENU để giữ chim lơ lửng
+        // Ở trạng thái STARTING, tiếp tục hiệu ứng lơ lửng cho mèo
+        birdManager->updateBird(*bird, MENU);  // Sử dụng logic của MENU để giữ mèo lơ lửng
 
         // Cập nhật vị trí các ống
         for (size_t i = 0; i < pipes.size(); i++) {
@@ -168,7 +181,7 @@ void Game::update() {
 
         // Tăng bộ đếm thời gian delay
         delayTimer += 0.016f;  // 16ms mỗi frame (60 FPS)
-        if (delayTimer >= 0.40f) {  // Sau 0,25 giây
+        if (delayTimer >= 0.5f) {  // Sau 0,5 giây
             gameState = PLAYING;   // Chuyển sang trạng thái PLAYING
         }
         return;
@@ -178,7 +191,7 @@ void Game::update() {
         return;  // Không cập nhật nếu trò chơi đã kết thúc
     }
 
-    birdManager->updateBird(*bird, gameState);  // Cập nhật vị trí, animation và góc xoay của chim
+    birdManager->updateBird(*bird, gameState);  // Cập nhật vị trí, animation và góc xoay của mèo
 
     // Cập nhật vị trí các ống
     for (size_t i = 0; i < pipes.size(); i++) {
@@ -192,14 +205,14 @@ void Game::update() {
             pipePassed[i] = false;  // Đặt lại trạng thái vượt qua
         }
 
-        // Kiểm tra nếu chim vượt qua ống
+        // Kiểm tra nếu mèo vượt qua ống
         if (!pipePassed[i] && bird->rect.x > pipe.x + PIPE_WIDTH) {
             pipePassed[i] = true;  // Đánh dấu đã vượt qua
             score++;               // Tăng điểm
             sound.playPointSound();  // Phát âm thanh ghi điểm
         }
 
-        // Kiểm tra va chạm giữa chim và ống
+        // Kiểm tra va chạm giữa mèo và ống
         if (pipeManager->checkCollision(bird->rect.x, bird->rect.y, bird->rect.w, bird->rect.h, pipe.x, pipe.height)) {
             sound.playHitSound();  // Phát âm thanh va chạm
             sound.playDieSound();  // Phát âm thanh thua
@@ -207,16 +220,16 @@ void Game::update() {
         }
     }
 
-    // Kết thúc game nếu chim chạm đỉnh hoặc chạm base
+    // Kết thúc game nếu mèo chạm đỉnh hoặc chạm base
     int baseHeight = background->getBaseHeight();
-    if (bird->rect.y + bird->rect.h > SCREEN_HEIGHT - baseHeight) {  // Chim chạm base
-        bird->rect.y = SCREEN_HEIGHT - baseHeight - bird->rect.h;  // Đặt chim nằm trên base
+    if (bird->rect.y + bird->rect.h > SCREEN_HEIGHT - baseHeight) {  // Mèo chạm base
+        bird->rect.y = SCREEN_HEIGHT - baseHeight - bird->rect.h;  // Đặt mèo nằm trên base
         bird->velocity = 0;  // Dừng vận tốc
         sound.playHitSound();  // Phát âm thanh va chạm
         sound.playDieSound();  // Phát âm thanh thua
         gameState = GAME_OVER;  // Chuyển sang trạng thái game over
     }
-    if (bird->rect.y < 0) {  // Chim chạm đỉnh màn hình
+    if (bird->rect.y < 0) {  // Mèo chạm đỉnh màn hình
         sound.playHitSound();  // Phát âm thanh va chạm
         sound.playDieSound();  // Phát âm thanh thua
         gameState = GAME_OVER;  // Chuyển sang trạng thái game over
@@ -248,7 +261,7 @@ void Game::render() {
     // Vẽ nền và mặt đất
     background->render();
 
-    // Vẽ chim bằng birdManager
+    // Vẽ mèo bằng birdManager
     birdManager->render(renderer, *bird);
 
     if (gameState == MENU) {
@@ -262,29 +275,17 @@ void Game::render() {
         }
         renderScore();
     } else if (gameState == GAME_OVER) {
-        // Ở trạng thái game over, vẽ các ống, điểm số và thông báo "Game Over"
+        // Ở trạng thái game over, vẽ các ống, điểm số và gameover.png
         int baseHeight = background->getBaseHeight();
         for (const auto& pipe : pipes) {
             pipeManager->render(renderer, pipe, baseHeight);
         }
         renderScore();
 
-        // Hiển thị thông báo "Game Over"
-        TTF_Init();
-        TTF_Font* font = TTF_OpenFont("arial.ttf", 48);  // Cần có file font
-        if (font) {
-            SDL_Color textColor = {255, 0, 0, 255};  // Màu đỏ
-            SDL_Surface* textSurface = TTF_RenderText_Solid(font, "Game Over", textColor);
-            SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-            SDL_Rect textRect = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 24, 200, 48};
-            SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
-
-            // Giải phóng tài nguyên
-            SDL_FreeSurface(textSurface);
-            SDL_DestroyTexture(textTexture);
-            TTF_CloseFont(font);
+        // Hiển thị gameover.png
+        if (gameOverTexture) {
+            SDL_RenderCopy(renderer, gameOverTexture, nullptr, &gameOverRect);
         }
-        TTF_Quit();
     }
 
     SDL_RenderPresent(renderer);  // Hiển thị khung hình

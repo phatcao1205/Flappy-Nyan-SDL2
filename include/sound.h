@@ -13,12 +13,14 @@ public:
     void playHitSound();    // Phát âm thanh khi chim va chạm
     void playDieSound();    // Phát âm thanh khi chim thua
     void playPointSound();  // Phát âm thanh khi ghi điểm
+    void playBackgroundSound(); // Phát âm thanh khi ở ngoài menu
 
 private:
     Mix_Chunk* wingSound;   // Âm thanh khi chim nhảy
     Mix_Chunk* hitSound;    // Âm thanh khi va chạm
     Mix_Chunk* dieSound;    // Âm thanh khi thua
     Mix_Chunk* pointSound;  // Âm thanh khi ghi điểm
+    Mix_Music* backgroundSound;  // Âm thanh khi ở ngoài menu
 };
 
 #endif

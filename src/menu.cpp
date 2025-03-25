@@ -3,35 +3,44 @@
 #include "constants.h"
 
 // Hàm khởi tạo Menu
-Menu::Menu(SDL_Renderer* renderer) : renderer(renderer), messageTexture(nullptr) {
-    // Tải message.png
-    SDL_Surface* surface = IMG_Load("assets/message.png");
-    if (!surface) {
-        SDL_Log("Không thể tải message.png: %s", IMG_GetError());
-    } else {
-        messageTexture = SDL_CreateTextureFromSurface(renderer, surface);
-        if (!messageTexture) {
-            SDL_Log("Không thể tạo texture message: %s", SDL_GetError());
-        }
+Menu::Menu(SDL_Renderer* renderer) : renderer(renderer), currentFrame(0), frameDelay(500), frameTimer(0) {
+    // Tải 2 texture cho animation: message1.png và message2.png
+    const char* messageFiles[2] = {
+        "assets/message1.png",
+        "assets/message2.png"
+    };
 
-        // Đặt vị trí và kích thước của message.png (căn giữa màn hình)
-        int width = surface->w;
-        int height = surface->h;
-        messageRect = { (SCREEN_WIDTH - width) / 2, (SCREEN_HEIGHT - height) / 2, width, height };
+    for (int i = 0; i < 2; i++) {
+        SDL_Surface* surface = IMG_Load(messageFiles[i]);
+        messageTextures[i] = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
     }
+
+    // Đặt vị trí và kích thước của message (căn giữa màn hình)
+    messageRect.w = 722/2;  
+    messageRect.h = 969/2;
+    messageRect.x = (SCREEN_WIDTH - messageRect.w) / 2;
+    messageRect.y = (SCREEN_HEIGHT - messageRect.h) / 2;
 }
 
 // Hàm hủy, giải phóng tài nguyên
 Menu::~Menu() {
-    if (messageTexture) {
-        SDL_DestroyTexture(messageTexture);
+    for (int i = 0; i < 2; i++) {
+        SDL_DestroyTexture(messageTextures[i]);
     }
 }
 
-// Vẽ menu
+// Vẽ menu với animation
 void Menu::render() {
-    if (messageTexture) {
-        SDL_RenderCopy(renderer, messageTexture, nullptr, &messageRect);
+    // Cập nhật animation
+    frameTimer += 16;  // Giả sử mỗi frame của game là 16ms (60 FPS)
+    if (frameTimer >= frameDelay) {
+        frameTimer = 0;
+        currentFrame = (currentFrame + 1) % 2;  // Chuyển đổi giữa 2 frame
+    }
+
+    // Vẽ frame hiện tại
+    if (messageTextures[currentFrame]) {
+        SDL_RenderCopy(renderer, messageTextures[currentFrame], nullptr, &messageRect);
     }
 }

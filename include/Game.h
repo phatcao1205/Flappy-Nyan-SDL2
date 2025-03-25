@@ -26,19 +26,21 @@ public:
 private:
     SDL_Window* window;    // Cửa sổ trò chơi
     SDL_Renderer* renderer;  // Renderer để vẽ lên màn hình
-    Bird* bird;            // Đối tượng chim (sử dụng con trỏ vì forward declaration)
+    Bird* bird;            // Đối tượng mèo (trước đây là chim)
     std::vector<Pipe> pipes;  // Danh sách các ống
     bool running;          // Trạng thái chạy của cửa sổ
     GameState gameState;   // Trạng thái của trò chơi
     Sound sound;           // Đối tượng quản lý âm thanh
     int score;             // Điểm số của người chơi
-    std::vector<bool> pipePassed;  // Theo dõi xem chim đã vượt qua ống nào chưa
+    std::vector<bool> pipePassed;  // Theo dõi xem mèo đã vượt qua ống nào chưa
     SDL_Texture* digitTextures[10];  // Mảng lưu texture của các chữ số 0-9
     Background* background;          // Đối tượng quản lý nền và mặt đất
     PipeManager* pipeManager;        // Đối tượng quản lý ống
-    BirdManager* birdManager;        // Đối tượng quản lý chim
+    BirdManager* birdManager;        // Đối tượng quản lý mèo
     Menu* menu;                      // Đối tượng quản lý menu
-    float delayTimer;                // Bộ đếm thời gian delay (mới thêm)
+    float delayTimer;                // Bộ đếm thời gian delay
+    SDL_Texture* gameOverTexture;    // Texture cho gameover.png (mới thêm)
+    SDL_Rect gameOverRect;           // Vị trí và kích thước của gameover.png (mới thêm)
 
     void handleEvents();  // Xử lý các sự kiện (nhấn phím, thoát game, v.v.)
     void update();        // Cập nhật trạng thái trò chơi

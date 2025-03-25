@@ -5,20 +5,14 @@
 // Hàm khởi tạo âm thanh
 Sound::Sound() {
     // Khởi tạo SDL Mixer
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-        std::cerr << "Không thể khởi tạo SDL Mixer: " << Mix_GetError() << std::endl;
-    }
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 
     // Tải các file âm thanh
     wingSound = Mix_LoadWAV("sounds/wing.wav");
     hitSound = Mix_LoadWAV("sounds/hit.wav");
     dieSound = Mix_LoadWAV("sounds/die.wav");
     pointSound = Mix_LoadWAV("sounds/point.wav");
-
-    // Kiểm tra nếu có lỗi khi tải âm thanh
-    if (!wingSound || !hitSound || !dieSound || !pointSound) {
-        std::cerr << "Không thể tải âm thanh: " << Mix_GetError() << std::endl;
-    }
+    backgroundSound = Mix_LoadMUS("sounds/background.mp3");
 }
 
 // Hàm hủy, giải phóng tài nguyên âm thanh
@@ -27,6 +21,7 @@ Sound::~Sound() {
     Mix_FreeChunk(hitSound);
     Mix_FreeChunk(dieSound);
     Mix_FreeChunk(pointSound);
+    Mix_FreeMusic(backgroundSound);
     Mix_CloseAudio();
 }
 
@@ -55,5 +50,11 @@ void Sound::playDieSound() {
 void Sound::playPointSound() {
     if (pointSound) {
         Mix_PlayChannel(-1, pointSound, 0);
+    }
+}
+// Phát âm thanh khi ghi điểm
+void Sound::playBackgroundSound() {
+    if (backgroundSound) {
+        Mix_PlayMusic(backgroundSound, -1);
     }
 }

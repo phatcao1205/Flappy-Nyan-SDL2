@@ -4,35 +4,34 @@
 #include <cmath>  // Để sử dụng sin()
 
 // Hàm khởi tạo BirdManager
-BirdManager::BirdManager(SDL_Renderer* renderer) : renderer(renderer), currentFrame(0), frameDelay(100), frameTimer(0), hoverTimer(0) {
-    // Tải 3 texture cho các trạng thái vỗ cánh
-    const char* birdFiles[3] = {
-        "assets/yellowbird-upflap.png",
-        "assets/yellowbird-midflap.png",
-        "assets/yellowbird-downflap.png"
+BirdManager::BirdManager(SDL_Renderer* renderer) : renderer(renderer), currentFrame(0), frameDelay(70), frameTimer(0), hoverTimer(0) {
+    const char* birdFiles[12] = {
+        "assets/cat1.png",
+        "assets/cat2.png",
+        "assets/cat3.png",
+        "assets/cat4.png",
+        "assets/cat5.png",
+        "assets/cat6.png",
+        "assets/cat7.png",
+        "assets/cat8.png",
+        "assets/cat9.png",
+        "assets/cat10.png",
+        "assets/cat11.png",
+        "assets/cat12.png"
     };
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 12; i++) {
         SDL_Surface* surface = IMG_Load(birdFiles[i]);
-        if (!surface) {
-            SDL_Log("Không thể tải %s: %s", birdFiles[i], IMG_GetError());
-            birdTextures[i] = nullptr;
-            continue;
-        }
         birdTextures[i] = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
-        if (!birdTextures[i]) {
-            SDL_Log("Không thể tạo texture từ %s: %s", birdFiles[i], SDL_GetError());
-        }
     }
 }
 
 // Hàm hủy, giải phóng tài nguyên
 BirdManager::~BirdManager() {
-    for (int i = 0; i < 3; i++) {
-        if (birdTextures[i]) {
+    for (int i = 0; i < 12; i++) {
             SDL_DestroyTexture(birdTextures[i]);
-        }
+
     }
 }
 
@@ -74,7 +73,7 @@ void BirdManager::updateBird(Bird& bird, GameState gameState) {
     frameTimer += 16;  // Giả sử mỗi frame của game là 16ms (60 FPS)
     if (frameTimer >= frameDelay) {
         frameTimer = 0;
-        currentFrame = (currentFrame + 1) % 3;  // Chuyển đổi giữa 3 frame
+        currentFrame = (currentFrame + 1) % 12;  // Chuyển đổi giữa 3 frame
     }
 }
 

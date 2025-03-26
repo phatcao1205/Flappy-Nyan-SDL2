@@ -14,6 +14,7 @@ public:
     void playDieSound();    // Phát âm thanh khi chim thua
     void playPointSound();  // Phát âm thanh khi ghi điểm
     void playBackgroundSound(); // Phát âm thanh khi ở ngoài menu
+    void stopBackgroundSound();  // Dừng nhạc nền
 
 private:
     Mix_Chunk* wingSound;   // Âm thanh khi chim nhảy
@@ -21,6 +22,7 @@ private:
     Mix_Chunk* dieSound;    // Âm thanh khi thua
     Mix_Chunk* pointSound;  // Âm thanh khi ghi điểm
     Mix_Music* backgroundSound;  // Âm thanh khi ở ngoài menu
+    bool enabled=true;
 };
 
 #endif

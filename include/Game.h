@@ -3,8 +3,6 @@
 #define GAME_H
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
 #include <vector>
 #include "pipe.h"
 #include "sound.h"
@@ -39,10 +37,14 @@ private:
     BirdManager* birdManager;        // Đối tượng quản lý mèo
     Menu* menu;                      // Đối tượng quản lý menu
     float delayTimer;                // Bộ đếm thời gian delay
-    SDL_Texture* gameOverTexture;    // Texture cho gameover.png (mới thêm)
-    SDL_Rect gameOverRect;           // Vị trí và kích thước của gameover.png (mới thêm)
+    SDL_Texture* gameOverTexture;    // Texture cho gameover.png
+    SDL_Rect gameOverRect;           // Vị trí và kích thước của gameover.png
+    SDL_Texture* soundEnabledTexture;  // Texture cho sound-enabled.png (mới thêm)
+    SDL_Texture* soundDisabledTexture; // Texture cho sound-disabled.png (mới thêm)
+    SDL_Rect soundIconRect;            // Vị trí và kích thước của icon âm thanh (mới thêm)
+    bool isBackgroundMusicEnabled;     // Trạng thái nhạc nền (bật/tắt)
 
-    void handleEvents();  // Xử lý các sự kiện (nhấn phím, thoát game, v.v.)
+    void handleEvents();  // Xử lý các sự kiện (nhấn phím, thoát game, nhấp chuột, v.v.)
     void update();        // Cập nhật trạng thái trò chơi
     void render();        // Vẽ các thành phần lên màn hình
     void initPipes();     // Khởi tạo các ống ban đầu

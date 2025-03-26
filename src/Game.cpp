@@ -17,7 +17,6 @@ Game::Game() {
 
     SDL_Surface* icon = IMG_Load("assets/icon.png");
     SDL_SetWindowIcon(window,icon);
-    sound.playBackgroundSound();
     // Khởi tạo đối tượng mèo (cấp phát động)
     bird = new Bird();
     bird->rect = {100, SCREEN_HEIGHT / 2, 80, 40};  // Kích thước mèo (có thể điều chỉnh nếu cần)
@@ -53,17 +52,23 @@ Game::Game() {
 
     // Lấy kích thước gốc của gameover.png và căn giữa
     int width = 0, height = 0;
-    if (gameOverTexture) {
-        SDL_QueryTexture(gameOverTexture, nullptr, nullptr, &width, &height);
-    } else {
-        // Nếu không tải được texture, sử dụng kích thước mặc định
-        width = 192;  // Kích thước mặc định (dựa trên Flappy Bird gốc)
-        height = 42;
-    }
+    SDL_QueryTexture(gameOverTexture, nullptr, nullptr, &width, &height);
     gameOverRect.w = width;
     gameOverRect.h = height;
     gameOverRect.x = (SCREEN_WIDTH - gameOverRect.w) / 2;
     gameOverRect.y = (SCREEN_HEIGHT - gameOverRect.h) / 2;
+    
+    isBackgroundMusicEnabled = true;  // Mặc định nhạc nền được bật
+    // Khởi tạo lại trạng thái âm thanh
+    SDL_Surface* soundEnabledSurface=IMG_Load("assets/sound-enabled.png");
+    soundEnabledTexture = SDL_CreateTextureFromSurface(renderer, soundEnabledSurface);
+    soundIconRect.w=50;
+    soundIconRect.h=50;
+    soundIconRect.x = SCREEN_WIDTH - soundIconRect.w - 10;
+    soundIconRect.y = SCREEN_HEIGHT - soundIconRect.h - 10;
+    SDL_Surface* soundDisabledSurface=IMG_Load("assets/sound-disabled.png");
+    soundDisabledTexture = SDL_CreateTextureFromSurface(renderer, soundDisabledSurface);
+    sound.playBackgroundSound();
 }
 
 // Hàm hủy, dọn dẹp tài nguyên
@@ -73,6 +78,8 @@ Game::~Game() {
             SDL_DestroyTexture(digitTextures[i]);
     }
     SDL_DestroyTexture(gameOverTexture);
+    SDL_DestroyTexture(soundEnabledTexture);
+    SDL_DestroyTexture(soundDisabledTexture);
     delete bird;        // Giải phóng đối tượng mèo
     delete background;  // Giải phóng background
     delete pipeManager; // Giải phóng pipe manager
@@ -122,6 +129,16 @@ void Game::restart() {
 
     // Khởi tạo lại các ống
     initPipes();
+    
+    // Khởi tạo lại trạng thái âm thanh
+    SDL_Surface* soundEnabledSurface=IMG_Load("assets/sound-enabled.png");
+    soundEnabledTexture = SDL_CreateTextureFromSurface(renderer, soundEnabledSurface);
+    soundIconRect.w=50;
+    soundIconRect.h=50;
+    soundIconRect.x = SCREEN_WIDTH - soundIconRect.w - 10;
+    soundIconRect.y = SCREEN_HEIGHT - soundIconRect.h - 10;
+    SDL_Surface* soundDisabledSurface=IMG_Load("assets/sound-disabled.png");
+    soundDisabledTexture = SDL_CreateTextureFromSurface(renderer, soundDisabledSurface);
 }
 
 // Xử lý các sự kiện như nhấn phím hoặc thoát game
@@ -130,6 +147,19 @@ void Game::handleEvents() {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
             running = false;  // Thoát game nếu nhấn nút thoát
+        }
+        if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+            int mouseX, mouseY;
+            SDL_GetMouseState(&mouseX, &mouseY);
+            if (mouseX >= soundIconRect.x && mouseX <= soundIconRect.x + soundIconRect.w &&
+                mouseY >= soundIconRect.y && mouseY <= soundIconRect.y + soundIconRect.h) {
+                isBackgroundMusicEnabled = !isBackgroundMusicEnabled;
+                if (isBackgroundMusicEnabled) {
+                    sound.playBackgroundSound();
+                } else {
+                    sound.stopBackgroundSound();
+                }
+            }
         }
         if (event.type == SDL_KEYDOWN) {
             if (event.key.keysym.sym == SDLK_SPACE) {
@@ -287,7 +317,18 @@ void Game::render() {
             SDL_RenderCopy(renderer, gameOverTexture, nullptr, &gameOverRect);
         }
     }
-
+    // Chỉ hiện trạng thái trong menumenu
+    if(gameState==MENU){
+        if (isBackgroundMusicEnabled && soundEnabledTexture) {
+            SDL_RenderCopy(renderer, soundEnabledTexture, nullptr, &soundIconRect);
+        } else if (!isBackgroundMusicEnabled && soundDisabledTexture) {
+            SDL_RenderCopy(renderer, soundDisabledTexture, nullptr, &soundIconRect);
+        }
+    }
+    else{
+        SDL_DestroyTexture(soundEnabledTexture);
+        SDL_DestroyTexture(soundDisabledTexture); 
+    }
     SDL_RenderPresent(renderer);  // Hiển thị khung hình
 }
 

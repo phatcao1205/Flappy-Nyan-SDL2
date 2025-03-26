@@ -58,3 +58,9 @@ void Sound::playBackgroundSound() {
         Mix_PlayMusic(backgroundSound, -1);
     }
 }
+// Dừng nhạc nền
+void Sound::stopBackgroundSound() {
+    if (Mix_PlayingMusic()) {
+        Mix_HaltMusic();
+    }
+}

@@ -9,12 +9,12 @@ class Sound {
 public:
     Sound();   // Hàm khởi tạo
     ~Sound();  // Hàm hủy
-    void playWingSound();   // Phát âm thanh khi chim nhảy
-    void playHitSound();    // Phát âm thanh khi chim va chạm
-    void playDieSound();    // Phát âm thanh khi chim thua
-    void playPointSound();  // Phát âm thanh khi ghi điểm
-    void playBackgroundSound(); // Phát âm thanh khi ở ngoài menu
-    void stopBackgroundSound();  // Dừng nhạc nền
+    void playWingSound(bool sound);   // Phát âm thanh khi chim nhảy
+    void playHitSound(bool sound);    // Phát âm thanh khi chim va chạm
+    void playDieSound(bool sound);    // Phát âm thanh khi chim thua
+    void playPointSound(bool sound);  // Phát âm thanh khi ghi điểm
+    void playBackgroundMusic(); // Phát âm thanh khi ở ngoài menu
+    void stopBackgroundMusic();  // Dừng nhạc nền
 
 private:
     Mix_Chunk* wingSound;   // Âm thanh khi chim nhảy
@@ -22,7 +22,7 @@ private:
     Mix_Chunk* dieSound;    // Âm thanh khi thua
     Mix_Chunk* pointSound;  // Âm thanh khi ghi điểm
     Mix_Music* backgroundSound;  // Âm thanh khi ở ngoài menu
-    bool enabled=true;
+    bool sound;
 };
 
 #endif

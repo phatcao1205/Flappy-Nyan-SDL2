@@ -37,7 +37,7 @@ BirdManager::~BirdManager() {
 
 // Cập nhật trạng thái chim (vị trí, vận tốc, animation và góc xoay)
 void BirdManager::updateBird(Bird& bird, GameState gameState) {
-    if (gameState == MENU) {
+    if (gameState == MENU||gameState == SETTING) {
         // Ở trạng thái MENU, làm chim lơ lửng (di chuyển lên xuống nhẹ nhàng)
         hoverTimer += 0.1f;  // Tăng bộ đếm thời gian (điều chỉnh tốc độ dao động)
         float hoverAmplitude = 10.0f;  // Biên độ dao động (pixel)

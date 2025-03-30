@@ -26,40 +26,40 @@ Sound::~Sound() {
 }
 
 // Phát âm thanh khi chim nhảy
-void Sound::playWingSound() {
-    if (wingSound) {
+void Sound::playWingSound(bool sound) {
+    if (sound) {
         Mix_PlayChannel(-1, wingSound, 0);
     }
 }
 
 // Phát âm thanh khi chim va chạm
-void Sound::playHitSound() {
-    if (hitSound) {
+void Sound::playHitSound(bool sound) {
+    if (sound) {
         Mix_PlayChannel(-1, hitSound, 0);
     }
 }
 
 // Phát âm thanh khi chim thua
-void Sound::playDieSound() {
-    if (dieSound) {
+void Sound::playDieSound(bool sound) {
+    if (sound) {
         Mix_PlayChannel(-1, dieSound, 0);
     }
 }
 
 // Phát âm thanh khi ghi điểm
-void Sound::playPointSound() {
-    if (pointSound) {
+void Sound::playPointSound(bool sound) {
+    if (sound) {
         Mix_PlayChannel(-1, pointSound, 0);
     }
 }
 // Phát âm thanh khi ghi điểm
-void Sound::playBackgroundSound() {
+void Sound::playBackgroundMusic() {
     if (backgroundSound) {
         Mix_PlayMusic(backgroundSound, -1);
     }
 }
 // Dừng nhạc nền
-void Sound::stopBackgroundSound() {
+void Sound::stopBackgroundMusic() {
     if (Mix_PlayingMusic()) {
         Mix_HaltMusic();
     }

@@ -39,10 +39,23 @@ private:
     float delayTimer;                // Bộ đếm thời gian delay
     SDL_Texture* gameOverTexture;    // Texture cho gameover.png
     SDL_Rect gameOverRect;           // Vị trí và kích thước của gameover.png
+    
+    SDL_Texture* musicEnabledTexture;  // Texture cho sound-enabled.png (mới thêm)
+    SDL_Texture* musicDisabledTexture; // Texture cho sound-disabled.png (mới thêm)
+    SDL_Rect musicIconRect;  
+
     SDL_Texture* soundEnabledTexture;  // Texture cho sound-enabled.png (mới thêm)
     SDL_Texture* soundDisabledTexture; // Texture cho sound-disabled.png (mới thêm)
     SDL_Rect soundIconRect;            // Vị trí và kích thước của icon âm thanh (mới thêm)
+   
+    
+    SDL_Texture* settingTexture; // Texture cho sound-disabled.png (mới thêm)
+    SDL_Texture* backTexture; // Texture cho sound-disabled.png (mới thêm)
+    SDL_Rect settingRect;            // Vị trí và kích thước của icon âm thanh (mới thêm)
+
     bool isBackgroundMusicEnabled;     // Trạng thái nhạc nền (bật/tắt)
+    bool isSoundEnabled;
+    bool isSettingEnabled;              // Trạng thái của setting
 
     void handleEvents();  // Xử lý các sự kiện (nhấn phím, thoát game, nhấp chuột, v.v.)
     void update();        // Cập nhật trạng thái trò chơi

@@ -7,7 +7,8 @@ enum GameState {
     MENU,      // Trạng thái hiển thị menu
     STARTING,  // Trạng thái delay sau khi nhấn Space (mới thêm)
     PLAYING,   // Trạng thái đang chơi
-    GAME_OVER  // Trạng thái kết thúc trò chơi
+    GAME_OVER,  // Trạng thái kết thúc trò chơi
+    SETTING
 };
 
 #endif

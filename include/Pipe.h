@@ -5,22 +5,26 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-// Cấu trúc Pipe đại diện cho một cặp ống (trên và dưới)
+// Cấu trúc Pipe đại diện cho vị trí và chiều cao của một ống trên
 struct Pipe {
-    int x, height;  // Tọa độ x và chiều cao của ống trên
+    int x, height;
 };
 
-// Lớp PipeManager quản lý texture và logic của ống
+// Lớp PipeManager quản lý texture, logic va chạm và vẽ ống
 class PipeManager {
 public:
-    PipeManager(SDL_Renderer* renderer);  // Hàm khởi tạo
-    ~PipeManager();                       // Hàm hủy
-    bool checkCollision(int bx, int by, int bw, int bh, int px, int ph);  // Kiểm tra va chạm
-    void render(SDL_Renderer* renderer, const Pipe& pipe, int baseHeight);  // Vẽ ống, truyền thêm baseHeight
+    // Hàm khởi tạo PipeManager
+    PipeManager(SDL_Renderer* renderer);
+    // Hàm hủy PipeManager
+    ~PipeManager();
+    // Kiểm tra va chạm giữa hình chữ nhật của chim và một cặp ống
+    bool checkCollision(int bx, int by, int bw, int bh, int px, int ph);
+    // Vẽ một cặp ống (trên và dưới) lên renderer
+    void render(SDL_Renderer* renderer, const Pipe& pipe, int baseHeight);
 
 private:
-    SDL_Texture* pipeTexture;  // Texture của pipe-green.png
-    int pipeWidth;             // Chiều rộng của ống (lấy từ texture)
+    SDL_Texture* pipeTexture;
+    int pipeWidth;
 };
 
-#endif
+#endif // PIPE_H

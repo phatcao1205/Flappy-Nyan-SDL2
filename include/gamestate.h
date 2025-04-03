@@ -2,13 +2,13 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
-// Trạng thái của trò chơi
+// Định nghĩa các trạng thái có thể có của trò chơi
 enum GameState {
-    MENU,      // Trạng thái hiển thị menu
-    STARTING,  // Trạng thái delay sau khi nhấn Space (mới thêm)
+    MENU,      // Trạng thái hiển thị menu chính
+    STARTING,  // Trạng thái chờ ngắn trước khi bắt đầu chơi
     PLAYING,   // Trạng thái đang chơi
-    GAME_OVER,  // Trạng thái kết thúc trò chơi
-    SETTING
+    GAME_OVER, // Trạng thái kết thúc trò chơi
+    SETTING    // Trạng thái màn hình cài đặt
 };
 
-#endif
+#endif // GAMESTATE_H

@@ -6,28 +6,32 @@
 #include <SDL2/SDL_image.h>
 #include "gamestate.h"
 
-// Cấu trúc Bird đại diện cho mèo (trước đây là chim)
+// Cấu trúc Bird đại diện cho trạng thái của mèo
 struct Bird {
-    SDL_Rect rect;  // Vị trí và kích thước của mèo
-    float velocity; // Vận tốc của mèo
-    double angle;   // Góc xoay của mèo (tính bằng độ)
+    SDL_Rect rect;
+    float velocity;
+    double angle;
 };
 
-// Lớp BirdManager quản lý texture và animation của mèo
+// Lớp BirdManager quản lý texture, animation và logic của mèo
 class BirdManager {
 public:
-    BirdManager(SDL_Renderer* renderer);  // Hàm khởi tạo
-    ~BirdManager();                       // Hàm hủy
-    void updateBird(Bird& bird, GameState gameState);  // Cập nhật trạng thái mèo
-    void render(SDL_Renderer* renderer, const Bird& bird);  // Vẽ mèo
+    // Hàm khởi tạo BirdManager
+    BirdManager(SDL_Renderer* renderer);
+    // Hàm hủy BirdManager
+    ~BirdManager();
+    // Cập nhật trạng thái mèo (vị trí, vận tốc, animation, góc xoay) dựa trên GameState
+    void updateBird(Bird& bird, GameState gameState);
+    // Vẽ mèo lên renderer
+    void render(SDL_Renderer* renderer, const Bird& bird);
 
 private:
     SDL_Renderer* renderer;
-    SDL_Texture* birdTextures[12];  // Texture cho 12 trạng thái animation (cat1.png đến cat12.png)
-    int currentFrame;               // Frame hiện tại của animation
-    int frameDelay;                 // Thời gian giữa các frame (ms), đặt là 70ms
-    int frameTimer;                 // Bộ đếm thời gian để chuyển frame
-    float hoverTimer;               // Bộ đếm thời gian cho hiệu ứng lơ lửng
+    SDL_Texture* birdTextures[12];
+    int currentFrame;
+    int frameDelay;
+    int frameTimer;
+    float hoverTimer;
 };
 
-#endif
+#endif // BIRD_H

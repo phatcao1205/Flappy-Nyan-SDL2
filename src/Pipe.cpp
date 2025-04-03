@@ -38,30 +38,29 @@ void PipeManager::render(SDL_Renderer* renderer, const Pipe& pipe, int baseHeigh
     int pipeHeight;
     SDL_QueryTexture(pipeTexture, nullptr, nullptr, nullptr, &pipeHeight);
 
-    // Vẽ ống trên (bắt đầu từ pipe.height, kéo dài lên đến y=0)
-    int topPipeHeight = pipe.height;  // Chiều cao từ y=0 đến pipe.height
-    int y = topPipeHeight;  // Bắt đầu từ đáy của ống trên (pipe.height)
+    int topPipeHeight = pipe.height;
+    int y = topPipeHeight;
     while (y > 0) {
-        int drawHeight = std::min(pipeHeight, y);  // Chiều cao texture cần vẽ
-        SDL_Rect topPipeSrc = {0, 0, pipeWidth, drawHeight};  // Lấy phần trên của texture
+        int drawHeight = std::min(pipeHeight, y);
+        SDL_Rect topPipeSrc = {0, 0, pipeWidth, drawHeight};
         SDL_Rect topPipeDst = {pipe.x, y - drawHeight, pipeWidth, drawHeight};
         SDL_RenderCopyEx(renderer, pipeTexture, &topPipeSrc, &topPipeDst, 180.0, nullptr, SDL_FLIP_NONE);
         y -= drawHeight;
     }
 
-    // Vẽ ống dưới (bắt đầu từ pipe.height + PIPE_GAP, kéo dài xuống đến đỉnh của base)
-    int bottomPipeY = SCREEN_HEIGHT - baseHeight;  // Đỉnh của base
-    int bottomPipeHeight = bottomPipeY - (pipe.height + PIPE_GAP);  // Chiều cao từ đỉnh base đến đáy ống dưới
-    // Đảm bảo chiều cao tối thiểu cho ống dưới
+   
+    int bottomPipeY = SCREEN_HEIGHT - baseHeight;
+    int bottomPipeHeight = bottomPipeY - (pipe.height + PIPE_GAP);
+
     if (bottomPipeHeight < MIN_BOTTOM_PIPE_HEIGHT) {
         bottomPipeHeight = MIN_BOTTOM_PIPE_HEIGHT;
     }
-    y = pipe.height + PIPE_GAP;  // Bắt đầu từ đỉnh của ống dưới
+    y = pipe.height + PIPE_GAP;
     int totalHeightDrawn = 0;
     while (totalHeightDrawn < bottomPipeHeight) {
         int remainingHeight = bottomPipeHeight - totalHeightDrawn;
-        int drawHeight = std::min(pipeHeight, remainingHeight);  // Chiều cao texture cần vẽ
-        SDL_Rect bottomPipeSrc = {0, 0, pipeWidth, drawHeight};  // Lấy phần trên của texture
+        int drawHeight = std::min(pipeHeight, remainingHeight);
+        SDL_Rect bottomPipeSrc = {0, 0, pipeWidth, drawHeight};
         SDL_Rect bottomPipeDst = {pipe.x, y + totalHeightDrawn, pipeWidth, drawHeight};
         SDL_RenderCopy(renderer, pipeTexture, &bottomPipeSrc, &bottomPipeDst);
         totalHeightDrawn += drawHeight;

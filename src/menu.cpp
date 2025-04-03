@@ -2,44 +2,33 @@
 #include "menu.h"
 #include "constants.h"
 
-// Hàm khởi tạo Menu
+// Hàm khởi tạo Menu, tải textures và thiết lập vị trí
 Menu::Menu(SDL_Renderer* renderer) : renderer(renderer), currentFrame(0), frameDelay(500), frameTimer(0) {
-    // Tải 2 texture cho animation: message1.png và message2.png
-    const char* messageFiles[2] = {
-        "assets/message1.png",
-        "assets/message2.png"
-    };
-
+    const char* messageFiles[2] = {"assets/message1.png", "assets/message2.png"};
     for (int i = 0; i < 2; i++) {
         SDL_Surface* surface = IMG_Load(messageFiles[i]);
         messageTextures[i] = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
     }
-
-    // Đặt vị trí và kích thước của message (căn giữa màn hình)
-    messageRect.w = 722/2;  
-    messageRect.h = 969/2;
-    messageRect.x = (SCREEN_WIDTH - messageRect.w) / 2;
-    messageRect.y = (SCREEN_HEIGHT - messageRect.h) / 2;
+    // Giả sử kích thước gốc là 722x969, chia đôi để hiển thị
+    messageRect = {(SCREEN_WIDTH - 722/2) / 2, (SCREEN_HEIGHT - 969/2) / 2, 722/2, 969/2};
 }
 
-// Hàm hủy, giải phóng tài nguyên
+// Hàm hủy, giải phóng textures của menu
 Menu::~Menu() {
     for (int i = 0; i < 2; i++) {
         SDL_DestroyTexture(messageTextures[i]);
     }
 }
 
-// Vẽ menu với animation
+// Vẽ menu, cập nhật animation giữa các frame
 void Menu::render() {
-    // Cập nhật animation
-    frameTimer += 16;  // Giả sử mỗi frame của game là 16ms (60 FPS)
+    frameTimer += 16; // Giả sử 60 FPS
     if (frameTimer >= frameDelay) {
         frameTimer = 0;
-        currentFrame = (currentFrame + 1) % 2;  // Chuyển đổi giữa 2 frame
+        currentFrame = (currentFrame + 1) % 2;
     }
 
-    // Vẽ frame hiện tại
     if (messageTextures[currentFrame]) {
         SDL_RenderCopy(renderer, messageTextures[currentFrame], nullptr, &messageRect);
     }

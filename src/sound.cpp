@@ -14,12 +14,7 @@ Sound::Sound() {
     pointSound = Mix_LoadWAV("sounds/point.wav");
     backgroundSound = Mix_LoadMUS("sounds/background.mp3");
 
-    // Thêm kiểm tra lỗi tải file ở đây nếu cần
-    if (!wingSound) std::cerr << "Failed to load wing sound! SDL_mixer Error: " << Mix_GetError() << std::endl;
-    // Tương tự cho các file khác...
-    if (!backgroundSound) std::cerr << "Failed to load background music! SDL_mixer Error: " << Mix_GetError() << std::endl;
 }
-
 // Hàm hủy, giải phóng tài nguyên âm thanh và đóng SDL_mixer
 Sound::~Sound() {
     Mix_FreeChunk(wingSound);

@@ -18,7 +18,7 @@ public:
     void render();
     // Lấy chiều cao của base
     int getBaseHeight();
-
+    
 private:
     SDL_Renderer* renderer;
     SDL_Texture* backgroundTexture;

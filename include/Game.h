@@ -14,6 +14,7 @@
 #include "gamestate.h"
 #include "constants.h"
 #include "bird.h" 
+#include "score.h"
 
 // Forward declaration
 struct Bird;
@@ -39,12 +40,14 @@ private:
     Sound sound;
     int score;
     std::vector<bool> pipePassed;
-    SDL_Texture* digitTextures[10];
     Background* background;
     PipeManager* pipeManager;
     BirdManager* birdManager;
     Menu* menu;
-    float delayTimer;
+    Score* scoreManager;
+
+    Uint32 delayStartTime;
+
     SDL_Texture* gameOverTexture;
     SDL_Rect gameOverRect;
 
@@ -56,21 +59,36 @@ private:
     SDL_Texture* soundDisabledTexture;
     SDL_Rect soundIconRect;
 
-    SDL_Texture* settingTexture;
+    SDL_Texture* infoTexture;
     SDL_Texture* backTexture;
-    SDL_Rect settingRect;
+    SDL_Texture* pauseTexture;
+    SDL_Rect infoRect;
 
-    SDL_Texture* settingCostumesTexture; 
-    SDL_Texture* settingMiscTexture;     
-    SDL_Rect settingCostumesRect;        
-    SDL_Rect settingMiscRect;        
+    SDL_Texture* tutTexture;
+    SDL_Rect tutRect;      
     
+    SDL_Texture* pauseBoardTexture; 
+    SDL_Rect pauseBoardRect;      
     
+    SDL_Texture* resumeTexture; 
+    SDL_Rect resumeRect;     
 
+    SDL_Texture* quitTexture; 
+    SDL_Rect quitRect;  
+
+    SDL_Texture* currentTexture; 
+    SDL_Rect currentRect; 
+    
+    SDL_Texture* highTexture; 
+    SDL_Rect highRect; 
+
+    SDL_Texture* restartTexture; 
+    SDL_Rect restartRect; 
+
+
+    bool isInfoEnabled;
     bool isBackgroundMusicEnabled;
     bool isSoundEnabled;
-    bool isSettingEnabled;
-    bool costume;
 
     // Tải một texture từ đường dẫn tệp
     SDL_Texture* loadTexture(const std::string& filePath);
@@ -83,11 +101,8 @@ private:
     // Khởi tạo vị trí ban đầu của các ống
     void initPipes();
     // Tải các texture chữ số 0-9
-    void loadDigitTextures();
-    // Vẽ điểm số hiện tại lên màn hình
-    void renderScore();
-    // Khởi động lại trò chơi về trạng thái ban đầu/menu
     void restart();
+    
 };
 
 #endif // GAME_H

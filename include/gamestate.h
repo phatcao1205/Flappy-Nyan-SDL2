@@ -8,7 +8,10 @@ enum GameState {
     STARTING,  // Trạng thái chờ ngắn trước khi bắt đầu chơi
     PLAYING,   // Trạng thái đang chơi
     GAME_OVER, // Trạng thái kết thúc trò chơi
-    SETTING    // Trạng thái màn hình cài đặt
+    PAUSE,
+    INFO,
+    RESUMING
+
 };
 
 #endif // GAMESTATE_H

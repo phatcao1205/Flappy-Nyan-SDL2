@@ -27,8 +27,7 @@ BirdManager::~BirdManager() {
 
 // Cập nhật trạng thái chim (vị trí, vận tốc, animation và góc xoay) tùy theo GameState
 void BirdManager::updateBird(Bird& bird, GameState gameState) {
-    if (gameState == MENU || gameState == SETTING) {
-        // Hiệu ứng lơ lửng ở menu/setting
+    if (gameState == MENU || gameState == INFO) {
         hoverTimer += 0.1f;
         float hoverAmplitude = 10.0f;
         float hoverOffset = sin(hoverTimer) * hoverAmplitude;
@@ -42,7 +41,7 @@ void BirdManager::updateBird(Bird& bird, GameState gameState) {
 
         const double MAX_UP_ANGLE = -45.0;
         const double MAX_DOWN_ANGLE = 90.0;
-        const double ANGLE_PER_VELOCITY = 2.5;
+        const double ANGLE_PER_VELOCITY = 3;
         const double SMOOTHING_FACTOR = 0.1;
 
         double targetAngle = bird.velocity * ANGLE_PER_VELOCITY;

@@ -15,10 +15,8 @@ Game::Game() {
     window = SDL_CreateWindow("Flappy Nyan", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_Surface* icon = IMG_Load("assets/icon.png");
-    if (icon) { // Kiểm tra icon có được tải thành công không
-        SDL_SetWindowIcon(window, icon);
-        SDL_FreeSurface(icon);
-    }
+    SDL_SetWindowIcon(window, icon);
+    SDL_FreeSurface(icon);
 
     bird = new Bird();
     bird->rect = {100, SCREEN_HEIGHT / 2, 80, 40};
@@ -26,13 +24,12 @@ Game::Game() {
     bird->angle = 0.0;
     running = true;
     gameState = MENU;
-    score = 0;
-    delayTimer = 0.0f;
+    delayStartTime = 0;
+    scoreManager = new Score(renderer);
 
     srand(time(0));
 
-    loadDigitTextures();
-
+    
     background = new Background(renderer);
     initPipes(); // Gọi sau khi background đã có để lấy baseHeight
     pipeManager = new PipeManager(renderer);
@@ -40,9 +37,7 @@ Game::Game() {
     menu = new Menu(renderer);
 
     gameOverTexture = loadTexture("assets/gameover.png");
-    int width = 0, height = 0;
-    SDL_QueryTexture(gameOverTexture, nullptr, nullptr, &width, &height);
-    gameOverRect = {(SCREEN_WIDTH - width) / 2, (SCREEN_HEIGHT - height) / 3, width, height};
+    gameOverRect = {(SCREEN_WIDTH - 384)/2, (SCREEN_HEIGHT - 84)/4, 192*2, 42*2};
 
     isSoundEnabled = true;
     soundEnabledTexture = loadTexture("assets/sound-enabled.png");
@@ -56,51 +51,56 @@ Game::Game() {
 
     sound.playBackgroundMusic(); // Bắt đầu nhạc nền
 
-    settingTexture = loadTexture("assets/setting.png");
+    isInfoEnabled=false;
+    infoTexture = loadTexture("assets/info.png");
     backTexture = loadTexture("assets/back.png");
-    settingRect = {10, SCREEN_HEIGHT - 50 - 10, 50, 50};
-    isSettingEnabled = false;
+    pauseTexture = loadTexture("assets/pause.png");
+    infoRect = {10, SCREEN_HEIGHT - 50 - 10, 50, 50};
 
-    settingCostumesTexture = loadTexture("assets/setting-costumes.png");
-    settingCostumesRect = {60, 20, 250, 60};
-    settingMiscTexture = loadTexture("assets/setting-miscellaneous.png");
-    settingMiscRect = {380, 20, 350, 60};
-    costume=true;
+    tutTexture = loadTexture("assets/tut.png");
+    tutRect = {20, 40, 775 , 400};
+    
+    pauseBoardTexture= loadTexture("assets/board.png");
+    pauseBoardRect = {(SCREEN_WIDTH-500)/2, (SCREEN_HEIGHT-250)/2, 500, 250};
+
+    resumeTexture= loadTexture("assets/resume.png");
+    resumeRect = {(SCREEN_WIDTH-200)/2-120, (SCREEN_HEIGHT-60)/2+60, 200, 60};
+    
+    quitTexture= loadTexture("assets/quit.png");
+    quitRect = {(SCREEN_WIDTH-200)/2+120, (SCREEN_HEIGHT-60)/2+60, 200, 60};
+    
+    currentTexture = loadTexture("assets/current.png");
+    currentRect = {(SCREEN_WIDTH-300)/2-70, (SCREEN_HEIGHT-100)/2+100, 350, 60};
+
+    highTexture = loadTexture("assets/high.png");
+    highRect = {(SCREEN_WIDTH-300)/2-50, (SCREEN_HEIGHT-80)/2, 300, 80};
+
+    restartTexture = loadTexture("assets/restart.png");
+    restartRect = {(SCREEN_WIDTH-416)/2, (SCREEN_HEIGHT-50)/2+175, 416, 50};
+
+
 }
 
 // Hàm hủy Game, giải phóng tất cả tài nguyên đã cấp phát
 Game::~Game() {
-    for (int i = 0; i < 10; i++) {
-        SDL_DestroyTexture(digitTextures[i]);
-    }
     SDL_DestroyTexture(gameOverTexture);
     SDL_DestroyTexture(soundEnabledTexture);
     SDL_DestroyTexture(soundDisabledTexture);
     SDL_DestroyTexture(musicEnabledTexture);
     SDL_DestroyTexture(musicDisabledTexture);
-    SDL_DestroyTexture(settingTexture);
     SDL_DestroyTexture(backTexture);
-    SDL_DestroyTexture(settingCostumesTexture);
-    SDL_DestroyTexture(settingMiscTexture);
 
     delete bird;
     delete background;
     delete pipeManager;
     delete birdManager;
     delete menu;
+    delete scoreManager;
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     IMG_Quit();
     SDL_Quit();
-}
-
-// Tải các texture cho chữ số từ 0 đến 9
-void Game::loadDigitTextures() {
-    for (int i = 0; i < 10; i++) {
-        std::string path = "assets/" + std::to_string(i) + ".png";
-        digitTextures[i] = loadTexture(path);
-    }
 }
 
 // Khởi tạo hoặc đặt lại vị trí các ống
@@ -122,11 +122,11 @@ void Game::restart() {
     bird->velocity = 0;
     bird->angle = 0.0;
     gameState = MENU;
-    score = 0;
-    delayTimer = 0.0f;
+    scoreManager->resetScore();
+    delayStartTime = 0;
     initPipes();
-    isSettingEnabled = false; // Đảm bảo thoát khỏi màn hình setting khi restart
-    // Không cần tải lại texture ở đây, chỉ cần đảm bảo trạng thái đúng
+    soundIconRect = {SCREEN_WIDTH - 50 - 10, SCREEN_HEIGHT - 50 - 10, 50, 50};
+    musicIconRect = {SCREEN_WIDTH - 50 - 50 - 20, SCREEN_HEIGHT - 50 - 10, 50, 50};
 }
 
 // Xử lý các sự kiện đầu vào từ người dùng (bàn phím, chuột, đóng cửa sổ)
@@ -151,28 +151,34 @@ void Game::handleEvents() {
             else if (mouseX >= soundIconRect.x && mouseX <= soundIconRect.x + soundIconRect.w &&
                      mouseY >= soundIconRect.y && mouseY <= soundIconRect.y + soundIconRect.h) {
                 isSoundEnabled = !isSoundEnabled;
-                // Có thể thêm âm thanh click nhỏ ở đây nếu muốn
+                sound.playPointSound(isSoundEnabled);
             }
-            
-            else if (mouseX >= settingMiscRect.x && mouseX <= settingMiscRect.x + settingMiscRect.w &&
-                     mouseY >= settingMiscRect.y && mouseY <= settingMiscRect.y + settingMiscRect.h) {
-                        costume=false;
+            else if (mouseX >= infoRect.x && mouseX <= infoRect.x + infoRect.w &&
+                     mouseY >= infoRect.y && mouseY <= infoRect.y + infoRect.h) {
+                    isInfoEnabled = !isInfoEnabled;
+                    if(isInfoEnabled&&gameState==MENU) gameState=INFO;
+                    else if(gameState==PLAYING) gameState=PAUSE;
+                    else if(gameState==INFO) gameState=MENU;
             }
-            else if (mouseX >= settingCostumesRect.x && mouseX <= settingCostumesRect.x + settingCostumesRect.w &&
-                     mouseY >= settingCostumesRect.y && mouseY <= settingCostumesRect.y + settingCostumesRect.h) {
-                        costume=true;
+            else if (gameState == MENU) {
+                gameState = STARTING;
+                delayStartTime = SDL_GetTicks();
+                sound.playWingSound(isSoundEnabled);
+            } else if (gameState == PLAYING) {
+                bird->velocity = JUMP_STRENGTH;
+                sound.playWingSound(isSoundEnabled);
+            } else if (gameState == PAUSE){
+                if (mouseX >= resumeRect.x && mouseX <= resumeRect.x + resumeRect.w &&
+                    mouseY >= resumeRect.y && mouseY <= resumeRect.y + resumeRect.h) {
+                       gameState = RESUMING;
+                       delayStartTime = SDL_GetTicks();
+                    }
+                else if (mouseX >= quitRect.x && mouseX <= quitRect.x + quitRect.w &&
+                    mouseY >= quitRect.y && mouseY <= quitRect.y + quitRect.h) {
+                       restart();
+                    }
             }
-            // Kiểm tra click vào icon cài đặt/quay lại
-            else if (mouseX >= settingRect.x && mouseX <= settingRect.x + settingRect.w &&
-                     mouseY >= settingRect.y && mouseY <= settingRect.y + settingRect.h) {
-            if(gameState == MENU) gameState = SETTING;
-            else if (gameState == SETTING){
-                gameState = MENU;
-                costume=true;
-            }
-            isSettingEnabled = (gameState == SETTING); // Cập nhật trạng thái isSettingEnabled
        }
-        }
         if (event.type == SDL_KEYDOWN) {
             if (event.key.keysym.sym == SDLK_SPACE) {
                 if (gameState == MENU) {
@@ -183,20 +189,25 @@ void Game::handleEvents() {
                     sound.playWingSound(isSoundEnabled);
                 }
             }
-            if (event.key.keysym.sym == SDLK_r && gameState == GAME_OVER) {
+            else if (event.key.keysym.sym == SDLK_r && gameState == GAME_OVER) {
                 restart();
+            }
+            else if (event.key.keysym.sym == SDLK_ESCAPE){
+                if(gameState==PLAYING) gameState=PAUSE;
+                else if(gameState==PAUSE) gameState=PLAYING;
             }
         }
     }
 }
 
 // Cập nhật logic trò chơi dựa trên trạng thái hiện tại
+
 void Game::update() {
-    if (gameState != GAME_OVER) {
+    if (gameState != GAME_OVER&&gameState!=PAUSE&&gameState!=RESUMING) {
         background->update(); // Luôn cập nhật nền trừ khi game over
     }
 
-    if (gameState == MENU || gameState == SETTING) {
+    if (gameState == MENU || gameState == INFO) {
         birdManager->updateBird(*bird, gameState); // Chỉ cập nhật hiệu ứng lơ lửng
         return;
     }
@@ -214,17 +225,27 @@ void Game::update() {
                 pipePassed[i] = false;
             }
         }
-        delayTimer += 0.016f; // Tăng bộ đếm delay
-        if (delayTimer >= 0.5f) {
+        Uint32 currentTime = SDL_GetTicks();
+        if (currentTime - delayStartTime >= 500) {
+            gameState = PLAYING; // Bắt đầu chơi
+        }
+        return;
+    }
+    if (gameState == RESUMING) {
+        Uint32 currentTime = SDL_GetTicks();
+        if (currentTime - delayStartTime >= 3000) {
             gameState = PLAYING; // Bắt đầu chơi
         }
         return;
     }
 
+
     if (gameState == GAME_OVER) {
         return; // Không làm gì khi game over
     }
-
+    if (gameState == PAUSE) {
+        return;
+    }
     // Trạng thái PLAYING
     birdManager->updateBird(*bird, gameState); // Cập nhật chim với trọng lực
 
@@ -238,13 +259,14 @@ void Game::update() {
             sound.playHitSound(isSoundEnabled);
             sound.playDieSound(isSoundEnabled);
             gameState = GAME_OVER;
+            scoreManager->checkHighScore();
             return; // Thoát sớm khi va chạm
         }
 
         // Kiểm tra ghi điểm
         if (!pipePassed[i] && bird->rect.x > pipes[i].x + PIPE_WIDTH) {
             pipePassed[i] = true;
-            score++;
+            scoreManager->incrementScore();
             sound.playPointSound(isSoundEnabled);
         }
 
@@ -264,6 +286,7 @@ void Game::update() {
         sound.playHitSound(isSoundEnabled);
         sound.playDieSound(isSoundEnabled);
         gameState = GAME_OVER;
+        scoreManager->checkHighScore();
     }
     if (bird->rect.y < 0) { // Va chạm trần
         bird->rect.y = 0; // Giữ chim ở mép trên
@@ -272,24 +295,7 @@ void Game::update() {
         sound.playHitSound(isSoundEnabled);
         sound.playDieSound(isSoundEnabled); // Vẫn tính là thua
         gameState = GAME_OVER;
-    }
-}
-
-// Vẽ điểm số hiện tại lên màn hình sử dụng các texture chữ số
-void Game::renderScore() {
-    std::string scoreStr = std::to_string(score);
-    int digitWidth = 30;
-    int digitHeight = 50;
-    int totalWidth = scoreStr.length() * digitWidth;
-    int startX = (SCREEN_WIDTH - totalWidth) / 2;
-    int startY = 50;
-
-    for (size_t i = 0; i < scoreStr.length(); i++) {
-        int digit = scoreStr[i] - '0';
-        if (digitTextures[digit]) {
-            SDL_Rect digitRect = {startX + static_cast<int>(i * digitWidth), startY, digitWidth, digitHeight};
-            SDL_RenderCopy(renderer, digitTextures[digit], nullptr, &digitRect);
-        }
+        scoreManager->checkHighScore();
     }
 }
 
@@ -303,44 +309,45 @@ void Game::render() {
     if (gameState == MENU) {
         menu->render(); // Vẽ thông điệp menu
         // Vẽ các icon điều khiển
+        SDL_RenderCopy(renderer, infoTexture, nullptr, &infoRect);
         SDL_RenderCopy(renderer, isBackgroundMusicEnabled ? musicEnabledTexture : musicDisabledTexture, nullptr, &musicIconRect);
         SDL_RenderCopy(renderer, isSoundEnabled ? soundEnabledTexture : soundDisabledTexture, nullptr, &soundIconRect);
-        SDL_RenderCopy(renderer, settingTexture, nullptr, &settingRect); // Icon cài đặt
-    } else if (gameState == STARTING || gameState == PLAYING) {
+    } else if (gameState == STARTING || gameState == PLAYING || gameState == RESUMING) {
         // Vẽ ống khi đang chờ hoặc đang chơi
         for (const auto& pipe : pipes) {
             pipeManager->render(renderer, pipe, baseHeight);
         }
-        renderScore(); // Vẽ điểm số
+        scoreManager->render(gameState);
+        SDL_RenderCopy(renderer, pauseTexture, nullptr, &infoRect);
     } else if (gameState == GAME_OVER) {
         // Vẽ ống và điểm số ở trạng thái game over
         for (const auto& pipe : pipes) {
             pipeManager->render(renderer, pipe, baseHeight);
         }
-        renderScore();
-        // Vẽ thông báo game over
-        if (gameOverTexture) {
+        scoreManager->render(gameState);
             SDL_RenderCopy(renderer, gameOverTexture, nullptr, &gameOverRect);
+            SDL_RenderCopy(renderer, currentTexture, nullptr, &currentRect);
+            SDL_RenderCopy(renderer, highTexture, nullptr, &highRect);
+            SDL_RenderCopy(renderer, restartTexture, nullptr, &restartRect);
+    }
+    else if (gameState == PAUSE){
+        for (const auto& pipe : pipes) {
+            pipeManager->render(renderer, pipe, baseHeight);
         }
-         // Có thể thêm nút Restart ở đây
-    } else if(gameState == SETTING){
-         // Vẽ các icon điều khiển trong màn hình setting
+        SDL_RenderCopy(renderer, pauseBoardTexture, nullptr, &pauseBoardRect);
+        SDL_RenderCopy(renderer, resumeTexture, nullptr, &resumeRect);
+        SDL_RenderCopy(renderer, quitTexture, nullptr, &quitRect);
+        musicIconRect = {(SCREEN_WIDTH-80)/2-80, (SCREEN_HEIGHT-80)/2-30, 80, 80};
+        soundIconRect = {(SCREEN_WIDTH-80)/2+80, (SCREEN_HEIGHT-80)/2-30, 80, 80};
         SDL_RenderCopy(renderer, isBackgroundMusicEnabled ? musicEnabledTexture : musicDisabledTexture, nullptr, &musicIconRect);
         SDL_RenderCopy(renderer, isSoundEnabled ? soundEnabledTexture : soundDisabledTexture, nullptr, &soundIconRect);
-        SDL_RenderCopy(renderer, backTexture, nullptr, &settingRect);
-        if(costume){
-            SDL_SetTextureAlphaMod(settingCostumesTexture,128);
-            SDL_SetTextureAlphaMod(settingMiscTexture,255);
-        }
-        else {
-            SDL_SetTextureAlphaMod(settingMiscTexture,128);
-            SDL_SetTextureAlphaMod(settingCostumesTexture,255);
-
-        }
-        SDL_RenderCopy(renderer, settingCostumesTexture, nullptr, &settingCostumesRect);
-        SDL_RenderCopy(renderer, settingMiscTexture, nullptr, &settingMiscRect);
     }
-
+    else if (gameState == INFO){
+        SDL_RenderCopy(renderer, backTexture, nullptr, &infoRect);
+        SDL_RenderCopy(renderer, tutTexture, nullptr, &tutRect);
+        SDL_RenderCopy(renderer, isBackgroundMusicEnabled ? musicEnabledTexture : musicDisabledTexture, nullptr, &musicIconRect);
+        SDL_RenderCopy(renderer, isSoundEnabled ? soundEnabledTexture : soundDisabledTexture, nullptr, &soundIconRect);
+    }
     SDL_RenderPresent(renderer); // Hiển thị những gì đã vẽ
 }
 

@@ -89,6 +89,12 @@ Game::~Game() {
     SDL_DestroyTexture(musicEnabledTexture);
     SDL_DestroyTexture(musicDisabledTexture);
     SDL_DestroyTexture(backTexture);
+    SDL_DestroyTexture(pauseBoardTexture);
+    SDL_DestroyTexture(resumeTexture);
+    SDL_DestroyTexture(quitTexture);
+    SDL_DestroyTexture(currentTexture);
+    SDL_DestroyTexture(highTexture);
+    SDL_DestroyTexture(restartTexture);
 
     delete bird;
     delete background;

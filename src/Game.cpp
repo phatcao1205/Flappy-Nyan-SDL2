@@ -189,6 +189,7 @@ void Game::handleEvents() {
             if (event.key.keysym.sym == SDLK_SPACE) {
                 if (gameState == MENU) {
                     gameState = STARTING; // Chuyển sang delay trước khi chơi
+                    delayStartTime = SDL_GetTicks();
                     sound.playWingSound(isSoundEnabled);
                 } else if (gameState == PLAYING) {
                     bird->velocity = JUMP_STRENGTH;

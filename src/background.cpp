@@ -1,8 +1,6 @@
-// background.cpp
 #include "background.h"
 #include "constants.h"
 
-// Hàm khởi tạo Background, tải textures
 Background::Background(SDL_Renderer* renderer) : renderer(renderer), backgroundTexture(nullptr), baseTexture(nullptr), backgroundX(0), baseX(0) {
     SDL_Surface* bgSurface = IMG_Load("assets/background-night.png");
     backgroundTexture = SDL_CreateTextureFromSurface(renderer, bgSurface);
@@ -16,13 +14,11 @@ Background::Background(SDL_Renderer* renderer) : renderer(renderer), backgroundT
     SDL_FreeSurface(baseSurface);
 }
 
-// Hàm hủy, giải phóng tài nguyên textures
 Background::~Background() {
     SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyTexture(baseTexture);
 }
 
-// Cập nhật vị trí của background và base, xử lý cuộn lặp lại
 void Background::update() {
     backgroundX -= BACKGROUND_SPEED;
     if (backgroundX <= -backgroundWidth) {
@@ -35,7 +31,6 @@ void Background::update() {
     }
 }
 
-// Vẽ background và base lên renderer, lặp lại để lấp đầy màn hình
 void Background::render() {
     for (int x = backgroundX; x < SCREEN_WIDTH; x += backgroundWidth) {
         SDL_Rect bgDst = {x, 0, backgroundWidth, SCREEN_HEIGHT - baseHeight};
@@ -48,7 +43,6 @@ void Background::render() {
     }
 }
 
-// Trả về chiều cao của base (mặt đất)
 int Background::getBaseHeight() {
     return baseHeight;
 }

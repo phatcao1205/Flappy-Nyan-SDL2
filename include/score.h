@@ -17,6 +17,7 @@ public:
     void incrementScore();
     void resetScore();
     void render(GameState gameState);
+    void renderTimer(int n);
     void checkHighScore();
 
 private:
@@ -25,11 +26,8 @@ private:
     int highScore;
     SDL_Texture* digitTextures[10];
 
-    // Hàm nội bộ để tải texture
     SDL_Texture* loadTexture(const std::string& filePath);
-    // Hàm nội bộ để tải tất cả textures chữ số
     void loadDigitTextures();
-
     int loadScoreFromFile();
     void saveScore(int score);
 };

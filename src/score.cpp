@@ -1,13 +1,11 @@
 #include "score.h"
 
 
-// Hàm khởi tạo
-Score::Score(SDL_Renderer* ren) : renderer(ren), score(0) { // <<--- ĐỔI TÊN CLASS::CONSTRUCTOR
+Score::Score(SDL_Renderer* ren) : renderer(ren), score(0) { 
     loadDigitTextures();
     highScore = loadScoreFromFile();
 }
 
-// Hàm hủy
 Score::~Score() { 
     for (int i = 0; i < 10; ++i) {
         if (digitTextures[i]) {
@@ -17,7 +15,6 @@ Score::~Score() {
     }
 }
 
-// Tải một texture từ đường dẫn file
 SDL_Texture* Score::loadTexture(const std::string& filePath) { 
     SDL_Surface* loadedSurface = IMG_Load(filePath.c_str());
     SDL_Texture* newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
@@ -26,7 +23,6 @@ SDL_Texture* Score::loadTexture(const std::string& filePath) {
 }
 
 
-// Tải các texture cho chữ số từ 0 đến 9
 void Score::loadDigitTextures() {
     for (int i = 0; i < 10; ++i) {
         std::string path = "assets/" + std::to_string(i) + ".png";
@@ -34,17 +30,14 @@ void Score::loadDigitTextures() {
     }
 }
 
-// Tăng điểm
 void Score::incrementScore() {
     score++;
 }
 
-// Reset điểm
 void Score::resetScore() {
     score = 0;
 }
 
-// Vẽ điểm số hiện tại lên màn hình sử dụng các texture chữ số
 void Score::render(GameState gameState) {
     std::string scoreStr = std::to_string(score);
     std::string highScoreStr = std::to_string(highScore);
@@ -53,7 +46,14 @@ void Score::render(GameState gameState) {
     int totalWidth = scoreStr.length() * digitWidth;
     int scoreX = (SCREEN_WIDTH - totalWidth) / 2;
     int scoreY = 50;
-    if(gameState == GAME_OVER) {
+    if(gameState == PLAYING){
+        for (size_t i = 0; i < scoreStr.length(); ++i) {
+            int digit = scoreStr[i] - '0';
+                SDL_Rect digitRect = {scoreX + static_cast<int>(i * digitWidth), scoreY, digitWidth, digitHeight};
+                SDL_RenderCopy(renderer, digitTextures[digit], nullptr, &digitRect);
+            }
+        }
+    else if(gameState == GAME_OVER) {
         scoreX = (SCREEN_WIDTH-300)/2+290;
         scoreY = (SCREEN_HEIGHT-100)/2+110;
         int highScoreX=(SCREEN_WIDTH-300)/2+260;
@@ -63,11 +63,11 @@ void Score::render(GameState gameState) {
                 SDL_Rect digitRect = {highScoreX + static_cast<int>(i * digitWidth), highScoreY, digitWidth, digitHeight};
                 SDL_RenderCopy(renderer, digitTextures[digit], nullptr, &digitRect);
         }
-    }
-    for (size_t i = 0; i < scoreStr.length(); ++i) {
-        int digit = scoreStr[i] - '0';
-            SDL_Rect digitRect = {scoreX + static_cast<int>(i * digitWidth), scoreY, digitWidth, digitHeight};
-            SDL_RenderCopy(renderer, digitTextures[digit], nullptr, &digitRect);
+        for (size_t i = 0; i < scoreStr.length(); ++i) {
+            int digit = scoreStr[i] - '0';
+                SDL_Rect digitRect = {scoreX + static_cast<int>(i * digitWidth), scoreY, digitWidth, digitHeight};
+                SDL_RenderCopy(renderer, digitTextures[digit], nullptr, &digitRect);
+            }
     }
 }
 
@@ -90,4 +90,9 @@ void Score::checkHighScore(){
         highScore=score;
         saveScore(highScore);
     }
+}
+
+void Score::renderTimer(int n){
+        SDL_Rect timerRect = {(SCREEN_WIDTH-60)/2,(SCREEN_HEIGHT-100)/2,60,100};
+        SDL_RenderCopy(renderer, digitTextures[n] , nullptr, &timerRect);
 }

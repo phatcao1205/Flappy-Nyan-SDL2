@@ -1,4 +1,3 @@
-// game.h
 #ifndef GAME_H
 #define GAME_H
 
@@ -16,18 +15,13 @@
 #include "bird.h" 
 #include "score.h"
 
-// Forward declaration
 struct Bird;
 class BirdManager;
 
-// Lớp Game quản lý toàn bộ logic của trò chơi
 class Game {
 public:
-    // Hàm khởi tạo Game
     Game();
-    // Hàm hủy Game
     ~Game();
-    // Chạy vòng lặp chính của trò chơi
     void run();
 
 private:
@@ -90,19 +84,14 @@ private:
     bool isBackgroundMusicEnabled;
     bool isSoundEnabled;
 
-    // Tải một texture từ đường dẫn tệp
     SDL_Texture* loadTexture(const std::string& filePath);
-    // Xử lý các sự kiện đầu vào (bàn phím, chuột, thoát)
     void handleEvents();
-    // Cập nhật trạng thái trò chơi (vị trí, va chạm, điểm số)
     void update();
-    // Vẽ các thành phần trò chơi lên màn hình
     void render();
-    // Khởi tạo vị trí ban đầu của các ống
     void initPipes();
-    // Tải các texture chữ số 0-9
     void restart();
+    bool checkCollision();
     
 };
 
-#endif // GAME_H
+#endif

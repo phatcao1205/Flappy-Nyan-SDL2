@@ -1,5 +1,6 @@
 #include "background.h"
 #include "constants.h"
+#include "score.h"
 
 Background::Background(SDL_Renderer* renderer) : renderer(renderer), backgroundTexture(nullptr), baseTexture(nullptr), backgroundX(0), baseX(0) {
     SDL_Surface* bgSurface = IMG_Load("assets/background-night.png");
@@ -33,13 +34,13 @@ void Background::update() {
 
 void Background::render() {
     for (int x = backgroundX; x < SCREEN_WIDTH; x += backgroundWidth) {
-        SDL_Rect bgDst = {x, 0, backgroundWidth, SCREEN_HEIGHT - baseHeight};
-        SDL_RenderCopy(renderer, backgroundTexture, nullptr, &bgDst);
+        SDL_Rect backgroundRect = {x, 0, backgroundWidth, SCREEN_HEIGHT};
+        SDL_RenderCopy(renderer, backgroundTexture, nullptr, &backgroundRect);
     }
 
     for (int x = baseX; x < SCREEN_WIDTH; x += baseWidth) {
-        SDL_Rect baseDst = {x, SCREEN_HEIGHT - baseHeight, baseWidth, baseHeight};
-        SDL_RenderCopy(renderer, baseTexture, nullptr, &baseDst);
+        SDL_Rect baseRect = {x, SCREEN_HEIGHT - baseHeight, baseWidth, baseHeight};
+        SDL_RenderCopy(renderer, baseTexture, nullptr, &baseRect);
     }
 }
 

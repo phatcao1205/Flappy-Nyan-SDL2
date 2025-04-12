@@ -28,10 +28,11 @@ Game::Game() {
 
     
     background = new Background(renderer);
-    initPipes(); 
     pipeManager = new PipeManager(renderer);
     birdManager = new BirdManager(renderer);
     menu = new Menu(renderer);
+    initPipes(); 
+
 
     gameOverTexture = loadTexture("assets/gameover.png");
     gameOverRect = {(SCREEN_WIDTH - 384)/2, (SCREEN_HEIGHT - 84)/4, 192*2, 42*2};
@@ -118,7 +119,7 @@ void Game::initPipes() {
 }
 
 void Game::restart() {
-    bird->rect = {100, SCREEN_HEIGHT / 2, 80, 40};
+    bird->rect = {100, (SCREEN_HEIGHT-80) / 2, 80, 40};
     bird->velocity = 0;
     bird->angle = 0.0;
     gameState = MENU;
@@ -131,7 +132,7 @@ void Game::restart() {
 bool Game::checkCollision() {
     int baseHeight = background->getBaseHeight();
 
-    if (bird->rect.y + bird->rect.h > SCREEN_HEIGHT - baseHeight) {
+    if (bird->rect.y + bird->rect.h > SCREEN_HEIGHT - baseHeight - 20) {
         return true;
     }
 
@@ -148,11 +149,7 @@ bool Game::checkCollision() {
         int bottomPipeHeight = SCREEN_HEIGHT - bottomPipeY;
         SDL_Rect bottomPipeRect = { pipe.x, bottomPipeY, currentPipeWidth, bottomPipeHeight };
 
-        if (SDL_HasIntersection(&bird->rect, &topPipeRect)) {
-            return true;
-        }
-
-        if (SDL_HasIntersection(&bird->rect, &bottomPipeRect)) {
+        if (SDL_HasIntersection(&bird->rect, &topPipeRect)||SDL_HasIntersection(&bird->rect, &bottomPipeRect)) {
             return true;
         }
     }
@@ -262,7 +259,7 @@ void Game::update() {
     if (gameState == GAME_OVER|| gameState == PAUSE) {
         return; 
     }
-    
+    if (gameState == PLAYING){
     birdManager->updateBird(*bird, gameState); 
 
     int baseHeight = background->getBaseHeight();
@@ -293,6 +290,7 @@ void Game::update() {
         scoreManager->checkHighScore();
     }
 }
+}
 
 void Game::render() {
     background->render(); 
@@ -309,15 +307,16 @@ void Game::render() {
     } else if (gameState == STARTING || gameState == PLAYING || gameState == RESUMING) {
         
         Uint32 currentTime = SDL_GetTicks();
-        if (currentTime - delayStartTime <= 1000) {
+        if (currentTime - delayStartTime <= 1008) {
             scoreManager->renderTimer(3);
         }
         else if (currentTime - delayStartTime <= 2000) {
             scoreManager->renderTimer(2);
         }
-        else if (currentTime - delayStartTime <= 3000) {
+        else if (currentTime - delayStartTime <= 3008) {
             scoreManager->renderTimer(1);
         }
+        
         for (const auto& pipe : pipes) {
             pipeManager->render(renderer, pipe, baseHeight);
         }

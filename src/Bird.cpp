@@ -24,20 +24,19 @@ BirdManager::~BirdManager() {
 
 void BirdManager::updateBird(Bird& bird, GameState gameState) {
     if (gameState == MENU || gameState == INFO) {
-        hoverTimer += 0.1f;
-        float hoverAmplitude = 10.0f;
-        float hoverOffset = sin(hoverTimer) * hoverAmplitude;
-        bird.rect.y = (SCREEN_HEIGHT-80)/2 + static_cast<int>(hoverOffset);
+        hoverTimer += 0.1;
+        float hoverOffset = sin(hoverTimer) * 10;
+        bird.rect.y = (SCREEN_HEIGHT-80)/2 + (int)(hoverOffset);
         bird.velocity = 0;
         bird.angle = 0;
     } else if (gameState == PLAYING) {
         
         bird.velocity += GRAVITY;
-        bird.rect.y += static_cast<int>(bird.velocity);
+        bird.rect.y += (int)(bird.velocity);
 
         const double MAX_UP_ANGLE = -45.0;
         const double MAX_DOWN_ANGLE = 90.0;
-        const double ANGLE_PER_VELOCITY = 3;
+        const double ANGLE_PER_VELOCITY = 4;
         const double SMOOTHING_FACTOR = 0.1;
 
         double targetAngle = bird.velocity * ANGLE_PER_VELOCITY;
